@@ -54,8 +54,8 @@ npm run start:dev                          # 🚀 http://localhost:3000/api
 
 | What | URL |
 |---|---|
-| 📖 **Swagger UI** (try every API live) | http://localhost:3000/api/docs |
-| ❤️‍🩹 **Health probe** | http://localhost:3000/api/v1/health |
+| 📖 **Swagger UI** (try every API live) | http://localhost:4000/api/docs |
+| ❤️‍🩹 **Health probe** | http://localhost:4000/api/v1/health |
 | 🧪 **Run tests** | `npm test` · coverage: `npm run test:cov` |
 
 > **Base URL** `http://localhost:3000/api` · **Versioning** URI-based → every route is `/api/v1/...` · **Auth** `Authorization: Bearer <accessToken>`
