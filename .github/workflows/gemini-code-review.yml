@@ -1,0 +1,40 @@
+name: Gemini AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect PR diff
+        run: |
+          git diff --unified=0 origin/${{ github.base_ref }}...HEAD > pr.diff
+          echo "Diff size: $(wc -l < pr.diff) lines"
+
+      - name: Gemini review
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          DIFF=$(jq -Rs . < pr.diff)
+          PROMPT="You are a senior NestJS/TypeScript reviewer. Review this PR diff for correctness bugs, security issues (auth, injection, secret handling), and NestJS best practices. Be concise; list findings as a markdown checklist. Diff:"
+          BODY=$(jq -n --arg p "$PROMPT" --argjson d "$DIFF" \
+            '{contents:[{parts:[{text:($p + "\n" + $d)}]}]}')
+          RESP=$(curl -sS -X POST \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}" \
+            -H 'Content-Type: application/json' -d "$BODY")
+          REVIEW=$(echo "$RESP" | jq -r '.candidates[0].content.parts[0].text // "Gemini returned no content."')
+          printf '## 🤖 Gemini AI Code Review\n\n%s\n' "$REVIEW" > review.md
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file review.md
