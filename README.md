@@ -1018,5 +1018,6 @@ PUT    /api/v1/feature-flags                  Create / update feature flag
 📖 **Live, always-current API docs:** run the app → **http://localhost:3000/api/docs** (Swagger, generated from code)
 
 *Built with NestJS · TypeScript · MongoDB · Redis · Kafka · Socket.IO*
+🌐 **Frontend Repository:** [M-Cart Frontend](https://github.com/1Mallesh/m-cart-next-fed-)
 
 </div>
