@@ -29,17 +29,24 @@ export class AuthService {
     name: string,
     email: string,
     password: string,
+    role?: Role,
   ): Promise<AuthTokensDto> {
     const existing = await this.users.findByEmail(email);
     if (existing) {
       throw new ConflictException('Email already registered');
     }
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    // super_admin grants the highest privilege — admin self-signup also gets it
+    // so the very first admin can be created. Everyone else gets their one role.
+    const roles =
+      role === Role.ADMIN || role === Role.SUPER_ADMIN
+        ? [Role.ADMIN, Role.SUPER_ADMIN]
+        : [role ?? Role.CUSTOMER];
     const user = await this.users.create({
       name,
       email,
       passwordHash,
-      roles: [Role.CUSTOMER],
+      roles,
     });
     return this.issueTokens(user);
   }

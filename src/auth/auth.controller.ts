@@ -37,7 +37,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new customer with email + password' })
   @ApiOkResponse({ type: AuthTokensDto })
   register(@Body() dto: RegisterDto): Promise<AuthTokensDto> {
-    return this.auth.register(dto.name, dto.email, dto.password);
+    return this.auth.register(dto.name, dto.email, dto.password, dto.role);
   }
 
   @Post('login')
